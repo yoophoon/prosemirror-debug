@@ -9,4 +9,7 @@ export default defineConfig({
 	build: {
 		outDir: "dist-site",
 	},
+	server:{
+		port:23333
+	}
 })

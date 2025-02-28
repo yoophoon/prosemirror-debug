@@ -7,11 +7,11 @@
     "skipLibCheck": true,
 
     "paths":{
-      "prosemirror-view":["./src/prosemirror-view/index"],
-      "prosemirror-model":["./src/prosemirror-model/index"],
-      "prosemirror-transform":["./src/prosemirror-transform/index"],
-      "prosemirror-state":["./src/prosemirror-state/index"],
-      "prosemirror-schema-basic":["./src/prosemirror-schema-basic/schema-basic"],
+      "prosemirror-view":["./prosemirror/prosemirror-view/index"],
+      "prosemirror-model":["./prosemirror/prosemirror-model/index"],
+      "prosemirror-transform":["./prosemirror/prosemirror-transform/index"],
+      "prosemirror-state":["./prosemirror/prosemirror-state/index"],
+      "prosemirror-schema-basic":["./prosemirror/prosemirror-schema-basic/schema-basic"],
     },
 
     /* Bundler mode */
@@ -28,5 +28,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "prosemirror/prosemirror-view", "prosemirror/prosemirror-transform", "prosemirror/prosemirror-state", "prosemirror/prosemirror-schema-basic", "prosemirror/prosemirror-model"]
 }
