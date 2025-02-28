@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    "paths":{
+      "prosemirror-view":["./src/prosemirror-view/index"],
+      "prosemirror-model":["./src/prosemirror-model/index"],
+      "prosemirror-transform":["./src/prosemirror-transform/index"],
+      "prosemirror-state":["./src/prosemirror-state/index"],
+      "prosemirror-schema-basic":["./src/prosemirror-schema-basic/schema-basic"],
+    },
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}
