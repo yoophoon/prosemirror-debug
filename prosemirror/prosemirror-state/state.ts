@@ -8,6 +8,10 @@ function bind<T extends Function>(f: T, self: any): T {
   return !self || !f ? f : f.bind(self)
 }
 
+/**
+ * 字段描述对象，prosemirror的一些概念如doc\selection\marks\scrollToSelection\plugin
+ * 包含init、apply两个方法，自重init会在实例化EditorState时调用，而apply则是在用户交互时调用
+ */
 class FieldDesc<T> {
   init: (config: EditorStateConfig, instance: EditorState) => T
   apply: (tr: Transaction, value: T, oldState: EditorState, newState: EditorState) => T
@@ -18,6 +22,14 @@ class FieldDesc<T> {
   }
 }
 
+/**
+ * 4个基础字段用来初始化、应用tr，state.config.fields指向这4个基础字段
+ * 后续的plugin也会生成一个FieldDesc实例并被push进state.config.fields
+ * doc：文档内容
+ * selection：选区内容
+ * storedMarks：文档格式
+ * scrollToSelection：文档变动
+ */
 const baseFields = [
   new FieldDesc<Node>("doc", {
     init(config) { return config.doc || config.schema!.topNodeType.createAndFill() },
@@ -42,6 +54,7 @@ const baseFields = [
 
 // Object wrapping the part of a state object that stays the same
 // across transactions. Stored in the state's `config` property.
+// 包含state里不受tr影响的属性方法对象，被挂载在state.config下
 class Configuration {
   fields: FieldDesc<any>[]
   plugins: Plugin[] = []
@@ -120,12 +133,18 @@ export class EditorState {
   }
 
   /// @internal
+  /// 在apply->applytransaction时调用
+  /// 函数会调用plugin的filterTransaction函数方便过滤transaction
   filterTransaction(tr: Transaction, ignore = -1) {
-    for (let i = 0; i < this.config.plugins.length; i++) if (i != ignore) {
-      let plugin = this.config.plugins[i]
-      if (plugin.spec.filterTransaction && !plugin.spec.filterTransaction.call(plugin, tr, this))
-        return false
-    }
+    for (let i = 0; i < this.config.plugins.length; i++)
+      if (i != ignore) {
+        let plugin = this.config.plugins[i];
+        if (
+          plugin.spec.filterTransaction &&
+          !plugin.spec.filterTransaction.call(plugin, tr, this)
+        )
+          return false;
+      }
     return true
   }
 
@@ -182,6 +201,8 @@ export class EditorState {
   get tr(): Transaction { return new Transaction(this) }
 
   /// Create a new state.
+  //MARK EditorState.create
+  /// 创建一个EditorState实例，将其初始化并返回
   static create(config: EditorStateConfig) {
     let $config = new Configuration(config.doc ? config.doc.type.schema : config.schema!, config.plugins)
     let instance = new EditorState($config)
@@ -217,12 +238,17 @@ export class EditorState {
   toJSON(pluginFields?: {[propName: string]: Plugin}): any {
     let result: any = {doc: this.doc.toJSON(), selection: this.selection.toJSON()}
     if (this.storedMarks) result.storedMarks = this.storedMarks.map(m => m.toJSON())
-    if (pluginFields && typeof pluginFields == 'object') for (let prop in pluginFields) {
-      if (prop == "doc" || prop == "selection")
-        throw new RangeError("The JSON fields `doc` and `selection` are reserved")
-      let plugin = pluginFields[prop], state = plugin.spec.state
-      if (state && state.toJSON) result[prop] = state.toJSON.call(plugin, (this as any)[plugin.key])
-    }
+    if (pluginFields && typeof pluginFields == "object")
+      for (let prop in pluginFields) {
+        if (prop == "doc" || prop == "selection")
+          throw new RangeError(
+            "The JSON fields `doc` and `selection` are reserved"
+          );
+        let plugin = pluginFields[prop],
+          state = plugin.spec.state;
+        if (state && state.toJSON)
+          result[prop] = state.toJSON.call(plugin, (this as any)[plugin.key]);
+      }
     return result
   }
 

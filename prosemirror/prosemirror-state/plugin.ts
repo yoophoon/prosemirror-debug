@@ -115,7 +115,13 @@ export interface StateField<T> {
 }
 
 const keys = Object.create(null)
-
+/**
+ * 如果构造plugin时不指定key则plugin实例的key=createKey('plugin')
+ * 这个函数会给每个未分配key的plugin指定一个key，key的命名规则 plugin$,plugin$1,plugin$2...
+ * 常量keys记录每种类型的plugin实例的数量
+ * @param name Plugin构造函数传入的值:plugin,PluginKey实例则为构造函数传入的name
+ * @returns 如果是第一个未分配key的plugin则返回plugin$，后续的未分配key的plugin则返回plugin$n-1
+ */
 function createKey(name: string) {
   if (name in keys) return name + "$" + ++keys[name]
   keys[name] = 0

@@ -1,6 +1,10 @@
+//@ts-nocheck
 import {EditorState, Plugin} from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { schema } from 'prosemirror-schema-basic'
+
+// https://nytimes.github.io/oak-byo-react-prosemirror-redux/post/prosemirror-basics/
+// ProseMirror Basics
 
 const counterPlugin=new Plugin({
   state:{

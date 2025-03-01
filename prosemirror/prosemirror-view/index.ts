@@ -148,6 +148,7 @@ export class EditorView {
 
   /// Update the editor's `state` prop, without touching any of the
   /// other props.
+  //MARK editorView.updateState
   updateState(state: EditorState) {
     this.updateStateInner(state, this._props)
   }
@@ -221,6 +222,7 @@ export class EditorView {
       this.domObserver.start()
     }
 
+    //传入前一个state，方便pluginView根据前一个state做相关操作
     this.updatePluginViews(prev)
     if ((this.dragging as Dragging)?.node && !prev.doc.eq(state.doc))
       this.updateDraggedNode(this.dragging as Dragging, prev)
@@ -254,6 +256,7 @@ export class EditorView {
     while (view = this.pluginViews.pop()) if (view.destroy) view.destroy()
   }
 
+  //MARK editorView.updatePluginViews
   private updatePluginViews(prevState?: EditorState) {
     if (!prevState || prevState.plugins != this.state.plugins || this.directPlugins != this.prevDirectPlugins) {
       this.prevDirectPlugins = this.directPlugins
@@ -497,6 +500,7 @@ export class EditorView {
   /// 如果DirectEditorProps.dispatchTransaction定义存在的话，函数会首先调用
   /// 否则将参数通过state.apply(tr)返回新的state传递给updateState
   /// 这个方法被绑定到EditorView的实例上以方便其能被轻松传递
+  //MARK editorView.dispatch
   dispatch(tr: Transaction) {
     let dispatchTransaction = this._props.dispatchTransaction
     if (dispatchTransaction) dispatchTransaction.call(this, tr)

@@ -1,0 +1,1 @@
+plugin.spec.view的初始化操作在实例化EditorView调用updatePluginViews完成，其初始化后返回的结果被push到editorView.pluginViews，方便后续state更新调用pluginView.update()
