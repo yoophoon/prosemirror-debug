@@ -296,6 +296,15 @@ export class EditorView {
   /// value is found. When `f` returns a truthy value, that is
   /// immediately returned. When `f` isn't provided, it is treated as
   /// the identity function (the prop value is returned directly).
+  //MARK editorView.someProp
+  /**
+   * 查找给定属性名的值，首先查找直接提供的值如DirectEditorProps，然后查找当前视图所包含扩展的
+   * 的props，最后查找当前state所包含扩展的props（按顺序查找）。如果非未定义值被找到则会调用传
+   * 入的f函数并将查找到的值作为参数传入。当f返回一个真值，someProp函数则立即将这个真值返回。
+   * 当未提供f函数时，这个函数就会将查找到的值直接返回
+   * @param propName 参数名称
+   * @param f propName键指向的值作为参数传入当前函数
+   */
   someProp<PropName extends keyof EditorProps, Result>(
     propName: PropName,
     f: (value: NonNullable<EditorProps[PropName]>) => Result
@@ -520,7 +529,12 @@ export class EditorView {
     return (this.root as Document).getSelection()
   }
 }
-
+//MARK computeDocDeco
+/**
+ * 获取关联在当前编辑器特性（attributes）上的decoration，常用的作为nodeViewDesc.outerDeco
+ * @param view 编辑器视图
+ * @returns 放回一个decoration数组
+ */
 function computeDocDeco(view: EditorView) {
   let attrs = Object.create(null)
   attrs.class = "ProseMirror"
@@ -739,6 +753,7 @@ export interface EditorProps<P = any> {
   /// they can also be used as a way to provide context information to
   /// the node view without adding it to the document itself.
   ///
+  ////MARK explaination for innerDecoration
   /// `innerDecorations` holds the decorations for the node's content.
   /// You can safely ignore this if your view has no content or a
   /// `contentDOM` property, since the editor will draw the decorations

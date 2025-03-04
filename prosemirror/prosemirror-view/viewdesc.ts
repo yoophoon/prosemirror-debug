@@ -28,6 +28,7 @@ export type ViewMutationRecord = MutationRecord | { type: "selection", target: D
 /// [define](#view.EditorProps.nodeViews) a custom node view.
 ///
 /// Objects returned as node views must conform to this interface.
+////MARK interface NodeView
 export interface NodeView {
   /// The outer DOM node that represents the document node.
   dom: DOMNode
@@ -760,40 +761,61 @@ export class NodeViewDesc extends ViewDesc {
   // decorations, possibly introducing nesting for marks. Then, in a
   // separate step, syncs the DOM inside `this.contentDOM` to
   // `this.children`.
+  //MARK nodeViewDesc.updateChildren
   updateChildren(view: EditorView, pos: number) {
     let inline = this.node.inlineContent, off = pos
     let composition = view.composing ? this.localCompositionInfo(view, pos) : null
     let localComposition = composition && composition.pos > -1 ? composition : null
     let compositionInChild = composition && composition.pos < 0
     let updater = new ViewTreeUpdater(this, localComposition && localComposition.node, view)
-    iterDeco(this.node, this.innerDeco, (widget, i, insideNode) => {
-      if (widget.spec.marks)
-        updater.syncToMarks(widget.spec.marks, inline, view)
-      else if ((widget.type as WidgetType).side >= 0 && !insideNode)
-        updater.syncToMarks(i == this.node.childCount ? Mark.none : this.node.child(i).marks, inline, view)
-      // If the next node is a desc matching this widget, reuse it,
-      // otherwise insert the widget as a new view desc.
-      updater.placeWidget(widget, view, off)
-    }, (child, outerDeco, innerDeco, i) => {
-      // Make sure the wrapping mark descs match the node's marks.
-      updater.syncToMarks(child.marks, inline, view)
-      // Try several strategies for drawing this node
-      let compIndex
-      if (updater.findNodeMatch(child, outerDeco, innerDeco, i)) {
-        // Found precise match with existing node view
-      } else if (compositionInChild && view.state.selection.from > off &&
-                 view.state.selection.to < off + child.nodeSize &&
-                 (compIndex = updater.findIndexWithChild(composition!.node)) > -1 &&
-                 updater.updateNodeAt(child, outerDeco, innerDeco, compIndex, view)) {
-        // Updated the specific node that holds the composition
-      } else if (updater.updateNextNode(child, outerDeco, innerDeco, view, i, off)) {
-        // Could update an existing node to reflect this node
-      } else {
-        // Add it as a new view
-        updater.addNode(child, outerDeco, innerDeco, view, off)
+    iterDeco(
+      this.node,
+      this.innerDeco,
+      (widget, i, insideNode) => {
+        if (widget.spec.marks)
+          updater.syncToMarks(widget.spec.marks, inline, view);
+        else if ((widget.type as WidgetType).side >= 0 && !insideNode)
+          updater.syncToMarks(
+            i == this.node.childCount ? Mark.none : this.node.child(i).marks,
+            inline,
+            view
+          );
+        // If the next node is a desc matching this widget, reuse it,
+        // otherwise insert the widget as a new view desc.
+        updater.placeWidget(widget, view, off);
+      },
+      (child, outerDeco, innerDeco, i) => {
+        // Make sure the wrapping mark descs match the node's marks.
+        // 确保包裹的markViewDesc匹配节点的marks
+        updater.syncToMarks(child.marks, inline, view);
+        // Try several strategies for drawing this node
+        // 尝试一系列策略来重绘这个节点
+        // 1.如果根据传入的信息找到对应的viewDesc则意味者不需要更新
+        // 2.更新触发组合的特定节点
+        // 3.尝试更新一个现有的节点来映射当前需要被更新的节点
+        // 4.将子节点插入到updater的子节点即根据节点新建一个viewDesc
+        let compIndex;
+        if (updater.findNodeMatch(child, outerDeco, innerDeco, i)) {
+          // Found precise match with existing node view
+        } else if (
+          compositionInChild &&
+          view.state.selection.from > off &&
+          view.state.selection.to < off + child.nodeSize &&
+          (compIndex = updater.findIndexWithChild(composition!.node)) > -1 &&
+          updater.updateNodeAt(child, outerDeco, innerDeco, compIndex, view)
+        ) {
+          // Updated the specific node that holds the composition
+        } else if (
+          updater.updateNextNode(child, outerDeco, innerDeco, view, i, off)
+        ) {
+          // Could update an existing node to reflect this node
+        } else {
+          // Add it as a new view
+          updater.addNode(child, outerDeco, innerDeco, view, off);
+        }
+        off += child.nodeSize;
       }
-      off += child.nodeSize
-    })
+    );
     // Drop all remaining descs after the current position.
     updater.syncToMarks([], inline, view)
     if (this.node.isTextblock) updater.addTextblockHacks()
@@ -849,13 +871,13 @@ export class NodeViewDesc extends ViewDesc {
 
   // If this desc must be updated to match the given node decoration,
   // do so and return true.
+  //MARK nodeViewDesc.update
   update(node: Node, outerDeco: readonly Decoration[], innerDeco: DecorationSource, view: EditorView) {
-    if (this.dirty == NODE_DIRTY ||
-        !node.sameMarkup(this.node)) return false
+    if (this.dirty == NODE_DIRTY || !node.sameMarkup(this.node)) return false
     this.updateInner(node, outerDeco, innerDeco, view)
     return true
   }
-
+  //MARK nodeViewDesc.updateInner
   updateInner(node: Node, outerDeco: readonly Decoration[], innerDeco: DecorationSource, view: EditorView) {
     this.updateOuterDeco(outerDeco)
     this.node = node
@@ -1030,6 +1052,13 @@ class CustomNodeViewDesc extends NodeViewDesc {
 // Sync the content of the given DOM node with the nodes associated
 // with the given array of view descs, recursing into mark descs
 // because this should sync the subtree for a whole node at a time.
+//MARK renderDescs
+/**
+ * 用node描述对象同步传入的DOM，递归mark描述对象因为其应该一次同步整个节点的子节点
+ * @param parentDOM 父节点
+ * @param descs 节点视图描述对象
+ * @param view editorView实例
+ */
 function renderDescs(parentDOM: HTMLElement, descs: readonly ViewDesc[], view: EditorView) {
   let dom = parentDOM.firstChild, written = false
   for (let i = 0; i < descs.length; i++) {
@@ -1158,6 +1187,8 @@ function rm(dom: DOMNode) {
 
 // Helper class for incrementally updating a tree of mark descs and
 // the widget and node descs inside of them.
+//MARK class ViewTreeUpdater
+// 用于增量更新mark描述对象树及其内部的widget(deco)和node描述对象的辅助类
 class ViewTreeUpdater {
   // Index into `this.top`'s child array, represents the current
   // update position.
@@ -1191,6 +1222,7 @@ class ViewTreeUpdater {
 
   // Sync the current stack of mark descs with the given array of
   // marks, reusing existing mark descs when possible.
+  //MARK viewTreeUpdater.syncToMarks
   syncToMarks(marks: readonly Mark[], inline: boolean, view: EditorView) {
     let keep = 0, depth = this.stack.length >> 1
     let maxKeep = Math.min(depth, marks.length)
@@ -1232,6 +1264,15 @@ class ViewTreeUpdater {
 
   // Try to find a node desc matching the given data. Skip over it and
   // return true when successful.
+  //MARK viewTreeUpdater.findNodeMatch
+  /**
+   * 尝试找到匹配传入数据的nodeViewDesc。
+   * @param node 被匹配的节点
+   * @param outerDeco 外部修饰
+   * @param innerDeco 内部修饰
+   * @param index 当前节点在其父节点的索引位置
+   * @returns 成功匹配返回true，匹配失败返回false
+   */
   findNodeMatch(node: Node, outerDeco: readonly Decoration[], innerDeco: DecorationSource, index: number): boolean {
     let found = -1, targetDesc
     if (index >= this.preMatch.index &&

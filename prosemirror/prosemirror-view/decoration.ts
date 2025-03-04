@@ -768,6 +768,12 @@ function insertAhead(array: Decoration[], i: number, deco: Decoration) {
 }
 
 // Get the decorations associated with the current props of a view.
+//MARK viewDecorations
+/**
+ * 获取关联在当前编辑器属性上的decoration，常用的作为nodeViewDesc.innerDeco
+ * @param view 编辑器视图
+ * @returns decorationSource
+ */
 export function viewDecorations(view: EditorView): DecorationSource {
   let found: DecorationSource[] = []
   view.someProp("decorations", f => {

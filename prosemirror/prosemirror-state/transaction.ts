@@ -183,6 +183,13 @@ export class Transaction extends Transform {
 
   /// Store a metadata property in this transaction, keyed either by
   /// name or by plugin.
+  /**
+   * 在tr上存储一个元数据，键值只能是字符串形式的name或者插件
+   * 只是在事务上存储一些元数据
+   * @param key 键
+   * @param value 值
+   * @returns 当前事务
+   */
   setMeta(key: string | Plugin | PluginKey, value: any): this {
     this.meta[typeof key == "string" ? key : key.key] = value
     return this

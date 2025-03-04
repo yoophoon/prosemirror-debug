@@ -330,8 +330,16 @@ function invalidMarks(type: NodeType, fragment: Fragment, start: number) {
 function definesContent(type: NodeType) {
   return type.spec.defining || type.spec.definingForContent
 }
-
+/**
+ * 范围替换
+ * @param tr 应用本次范围替换的事务
+ * @param from 范围替换在文档中的起点位置
+ * @param to 范围替换在文档中的终点位置
+ * @param slice 用于替换的新切片，这个切片由用户生成，非旧文档自带
+ * @returns 
+ */
 export function replaceRange(tr: Transform, from: number, to: number, slice: Slice) {
+  //如果slice的长度为0即没有用于替换的内容则删除选区范围
   if (!slice.size) return tr.deleteRange(from, to)
 
   let $from = tr.doc.resolve(from), $to = tr.doc.resolve(to)
@@ -414,9 +422,18 @@ function closeFragment(fragment: Fragment, depth: number, oldOpen: number, newOp
   }
   return fragment
 }
-
+//MARK replaceRangeWith
+/**
+ * 这个方法为tr.replaceRangeWith的内部实现
+ * @param tr 应用范围替换的事务
+ * @param from 范围替换在文档中的起点
+ * @param to 范围替换在文档中的重点
+ * @param node 用于范围替换的节点（内容）
+ */
 export function replaceRangeWith(tr: Transform, from: number, to: number, node: Node) {
+  //如果传进来的node不是行内节点且from和to相等(光标状态、非选区状态)并且光标所在区域的父节点内容不为空
   if (!node.isInline && from == to && tr.doc.resolve(from).parent.content.size) {
+    //从当前位置向顶层查找可以供插入node的位置
     let point = insertPoint(tr.doc, from, node.type)
     if (point != null) from = to = point
   }

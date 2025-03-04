@@ -245,6 +245,10 @@ export class Fragment {
   /// set of nodes. For `null`, it returns the empty fragment. For a
   /// fragment, the fragment itself. For a node or array of nodes, a
   /// fragment containing those nodes.
+  /// 根据一个可以被转译成节点集合创建一个片段。
+  /// 如果传入的参数是null则返回一个空的fragment
+  /// 如果传入的是一个fragment则返回自身。
+  /// 如果传入的是一个节点或者节点数组则返回一个包含这些节点的fragment
   static from(nodes?: Fragment | Node | readonly Node[] | null) {
     if (!nodes) return Fragment.empty
     if (nodes instanceof Fragment) return nodes

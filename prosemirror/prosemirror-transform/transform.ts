@@ -115,6 +115,20 @@ export class Transform {
   /// primitive tool which will _not_ move the start and end of its given
   /// range, and is useful in situations where you need more precise
   /// control over what happens.
+  /**
+   * 用传入的切片替换文档中的一个选区范围（用户选取内容则是选区范围，未选取内容则是在光标位置插入）
+   * 使用参数from、to以及切片的起点开放长度及终点开放长度属性进行模糊替换而不是采用固定的开始和
+   * 结束位置。这个方法可能会增加被替换的范围或者闭合在切片中被开放的节点以更适配所见即所得的期望
+   * （如放弃完全覆盖被替换区域的非定义上下文父节点[对应前者扩大被替换范围]或者包含一个来自切片被
+   * 定义为内容的开放父节点[对应后者闭合切片的开放节点]）
+   * 
+   * 这个方法用来处理粘贴等。相似方法tr.replace则是更主要的不会更改给定的范围的开始和结束位置的
+   * 工具也是在需要对事件有更精细的控制的情况下更有效
+   * @param from 范围替换在文档中的起点
+   * @param to 范围替换在文档中的重点
+   * @param slice 用于替换的切片内容
+   * @returns 应用本次替换的事务（transaction）
+   */
   replaceRange(from: number, to: number, slice: Slice): this {
     replaceRange(this, from, to, slice)
     return this
@@ -127,6 +141,16 @@ export class Transform {
   /// that does allow the given node to be placed. When the given range
   /// completely covers a parent node, this method may completely replace
   /// that parent node.
+
+  /**
+   * 用传入的node替换由'from'和'to’示意的模糊范围而非精确位置。当from和to是一样的
+   * 或者在某个传入的node不匹配的父节点的开始或结尾，这个方法可能会将这个范围扩大至允许替换
+   * node的父节点，这个方法可能会完全覆盖这个父节点
+   * @param from 范围替换在文档中的起点
+   * @param to 范围替换在文档中的重点
+   * @param node 用于范围替换的节点（内容）
+   * @returns 返回应用本次替换的事务（transaction）
+   */
   replaceRangeWith(from: number, to: number, node: Node): this {
     replaceRangeWith(this, from, to, node)
     return this

@@ -300,6 +300,8 @@ export function join(tr: Transform, pos: number, depth: number) {
 /// near `pos`, by searching up the node hierarchy when `pos` itself
 /// isn't a valid place but is at the start or end of a node. Return
 /// null if no position was found.
+/// 尝试找到一个可以在给定位置附近插入给定类型的节点的点，如果传入的pos不在有效的位置
+/// 如节点的开头或者结尾那么将会向顶层逐层搜索有效的位置。如果最终没有找到则返回null
 export function insertPoint(doc: Node, pos: number, nodeType: NodeType): number | null {
   let $pos = doc.resolve(pos)
   if ($pos.parent.canReplaceWith($pos.index(), $pos.index(), nodeType)) return pos

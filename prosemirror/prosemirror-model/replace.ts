@@ -5,8 +5,10 @@ import {ResolvedPos} from "./resolvedpos"
 
 /// Error type raised by [`Node.replace`](#model.Node.replace) when
 /// given an invalid replacement.
+/// 当node.replace被传入一个非法替换时引发的错误类型
 export class ReplaceError extends Error {}
 /*
+// 兼容写法
 ReplaceError = function(this: any, message: string) {
   let err = Error.call(this, message)
   ;(err as any).__proto__ = ReplaceError.prototype
@@ -21,6 +23,7 @@ ReplaceError.prototype.name = "ReplaceError"
 /// A slice represents a piece cut out of a larger document. It
 /// stores not only a fragment, but also the depth up to which nodes on
 /// both side are ‘open’ (cut through).
+/// 一个切片表示从一个更大的文档中切出一片。它存储着fragment、以及两边被切开的节点的深度
 export class Slice {
   /// Create a slice. When specifying a non-zero open depth, you must
   /// make sure that there are nodes of at least that depth at the
