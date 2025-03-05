@@ -598,7 +598,11 @@ function changedNodeViews(a: NodeViewSet, b: NodeViewSet) {
   for (let _ in b) nB++
   return nA != nB
 }
-
+/**
+ * 将一个插件作为参数传入并检查其是否存在state、filterTransaction及appendTransaction属性
+ * 直接传给EditorView的插件不能携带这些属性
+ * @param plugin 一个插件
+ */
 function checkStateComponent(plugin: Plugin) {
   if (plugin.spec.state || plugin.spec.filterTransaction || plugin.spec.appendTransaction)
     throw new RangeError("Plugins passed directly to the view must not have a state component")
@@ -818,8 +822,13 @@ export interface EditorProps<P = any> {
 
 /// The props object given directly to the editor view supports some
 /// fields that can't be used in plugins:
+//MARK interface DirectEditorProps
+/**
+ * 直接传给editorView的属性对象支持一些不能用在插件中的字段
+ */
 export interface DirectEditorProps extends EditorProps {
   /// The current state of the editor.
+  /** 编辑器当前的state */
   state: EditorState
 
   /// A set of plugins to use in the view, applying their [plugin
@@ -829,6 +838,14 @@ export interface DirectEditorProps extends EditorProps {
   /// [transaction](#state.PluginSpec.filterTransaction) filter or
   /// appender) will result in an error, since such plugins must be
   /// present in the state to work.
+  /**
+   * 在视图中使用的插件集合，这些插件只会应用其pluginSpec.view和pluginSpec.props
+   * 传递带有pluginSpec.state、.filterTransaction及.appendTransaction的plugin会报错
+   * 因为这样的插件必须用于editorState中工作
+   * 
+   * （和prosemirror的设计架构有关，directEditorProps中传入plugin更多的是与视图交互，
+   * 带状态或者能应用事务的插件需要集中在state模块定义使用）
+   */
   plugins?: readonly Plugin[]
 
   /// The callback over which to send transactions (state updates)
@@ -838,5 +855,12 @@ export interface DirectEditorProps extends EditorProps {
   /// state that has the transaction
   /// [applied](#state.EditorState.apply). The callback will be bound to have
   /// the view instance as its `this` binding.
+  /**
+   * 发送一个有视图产生的事务。如果指定了这个函数，则需要确保这个函数以editorState.updateState
+   * 更新一个由editorState.apply产生的新editorState结束。这个函数会被绑定到拥有editorView实例
+   * 对象上
+   * @param tr 事务
+   * @returns void
+   */
   dispatchTransaction?: (tr: Transaction) => void
 }

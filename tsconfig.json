@@ -12,6 +12,7 @@
       "prosemirror-transform":["./prosemirror/prosemirror-transform/index"],
       "prosemirror-state":["./prosemirror/prosemirror-state/index"],
       "prosemirror-schema-basic":["./prosemirror/prosemirror-schema-basic/schema-basic"],
+      "prosemirror-keymap":["./prosemirror/prosemirror-keymap/keymap.ts"],
     },
 
     /* Bundler mode */

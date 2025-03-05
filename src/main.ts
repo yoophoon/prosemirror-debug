@@ -1,5 +1,6 @@
 import { EditorState, Plugin } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+
 import './editor.css'
 
 let selectionSizePlugin=new Plugin({

@@ -6,6 +6,7 @@ const classesById = Object.create(null)
 
 /// Superclass for editor selections. Every selection type should
 /// extend this. Should not be instantiated directly.
+/** editorSelections的超类。每个selection类型都应该继承这个类。不应该被直接实例化 */
 export abstract class Selection {
   /// Initialize a selection with the head and anchor and ranges. If no
   /// ranges are given, constructs a single range across `$anchor` and

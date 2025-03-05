@@ -15,6 +15,11 @@ import {EditorState} from "./state"
 ///  - return true
 ///
 /// In some cases, the editor view is passed as a third argument.
+/**
+ * 成功应用到状态则返回true，否则返回false
+ * @param state 编辑器状态
+ * @param dispatch 事务分发函数
+ */
 export type Command = (state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView) => boolean
 
 const UPDATED_SEL = 1, UPDATED_MARKS = 2, UPDATED_SCROLL = 4
