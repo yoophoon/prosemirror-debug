@@ -161,7 +161,9 @@ export interface StateField<T> {
   /// that `instance` is a half-initialized state instance, and will
   /// not have values for plugin fields initialized after this one.
   /**
-   * 初始化字段的值。`config`将会是传递给`EditorState.create`的对象
+   * 初始化字段的值。`config`是传递给`EditorState.create`的对象，注意"instance"参数是一个
+   * 半初始化状态实例，没有当前插件之后初始化的插件的值  
+   * 插件是通过遍历进行初始化的已遍历的插件所能访问的状态自然不会携带尚未被遍历初始化的插件字段的值
    * @param config EditorStateConfig的实例
    * @param instance 
    * @returns 
@@ -172,14 +174,35 @@ export interface StateField<T> {
   /// field value. Note that the `newState` argument is again a partially
   /// constructed state does not yet contain the state from plugins
   /// coming after this one.
+  /**
+   * 应用指定事务到这个状态字段并返回一个新的字段值。注意`newState`参数也是不包含当前插件之后的
+   * 状态的半初始化的状态  
+   * 后面的插件还没被遍历应用这个事务其对应的状态oldState和newState所存储的内容是一样的
+   * @param tr 应用与此次状态更新的事务
+   * @param value 
+   * @param oldState 
+   * @param newState 
+   * @returns 
+   */
   apply: (tr: Transaction, value: T, oldState: EditorState, newState: EditorState) => T
 
   /// Convert this field to JSON. Optional, can be left off to disable
   /// JSON serialization for the field.
+  /**
+   * 将当前插件字段转换成JSON对象。这是个可选项可以不设置这个属性以禁止插件的JSON序列化
+   * @param value 将当前插件字段转换为JSON对象
+   */
   toJSON?: (value: T) => any
 
   /// Deserialize the JSON representation of this field. Note that the
   /// `state` argument is again a half-initialized state.
+  /**
+   * 反序列化当前字段的JSON对象。注意`state`参数是个半初始化状态
+   * @param config 用于生成editorState的配置对象与传给editorState.fromJSON的config一致
+   * @param value JSON中该字段的值
+   * @param state 用于挂载插件的状态实例
+   * @returns 插件在newEditorState中的状态字段
+   */
   fromJSON?: (config: EditorStateConfig, value: any, state: EditorState) => T
 }
 

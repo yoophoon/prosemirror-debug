@@ -262,7 +262,7 @@ function contentBetween(doc: Node, from: number, to: number) {
   if (dist > 0) {
     let next = $from.node(depth).maybeChild($from.indexAfter(depth))
     while (dist > 0) {
-      //没有子节点了当内容长度还是大于0则认为是存在内容的
+      //没有子节点了当内容长度还是大于0或者子节点为叶子节点则认为是存在内容的
       if (!next || next.isLeaf) return true
       next = next.firstChild
       dist--

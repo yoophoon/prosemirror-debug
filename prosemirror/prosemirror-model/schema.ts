@@ -90,7 +90,7 @@ export class NodeType {
   groups: readonly string[]
   /** attrs与defaultAttrs两者的区别：前者存储的是该值的标准 后者才是真正的值 */
   /// @internal
-  /** 节点类型所包含的属性 键值为属性对象 */
+  /** 节点类型所包含的属性 键值为属性描述符对象 */
   attrs: {[name: string]: Attribute}
   /// @internal
   /** 节点类型所包含的默认属性 键值为其名称所对应属性对象的类型的值*/
@@ -255,14 +255,25 @@ export class NodeType {
   /// return null. Note that, due to the fact that required nodes can
   /// always be created, this will always succeed if you pass null or
   /// `Fragment.empty` as content.
+  /**
+   * 与`nodeType.create`类似，但是会查看是否需要在给定的fragment的开头或者结尾添加节点以适配当前nodeType，
+   * 如果没找到合适的包裹对象则返回null。注意：由于必要的节点总是能被创建，
+   * 如果null或者`Fragment.empty`作为content参数被传入，这必将会返回一个节点
+   * @param attrs 节点属性对象 默认值null
+   * @param content 节点内容
+   * @param marks 节点marks
+   * @returns 一个节点对象或者null
+   */
   createAndFill(attrs: Attrs | null = null, content?: Fragment | Node | readonly Node[] | null, marks?: readonly Mark[]) {
     attrs = this.computeAttrs(attrs)
     content = Fragment.from(content)
+    // 传入的内容不为空
     if (content.size) {
       let before = this.contentMatch.fillBefore(content)
       if (!before) return null
       content = before.append(content)
     }
+    // 查询传入的内容是否与当前节点类型的内容匹配
     let matched = this.contentMatch.matchFragment(content)
     let after = matched && matched.fillBefore(Fragment.empty, true)
     if (!after) return null
@@ -272,8 +283,8 @@ export class NodeType {
   /// Returns true if the given fragment is valid content for this node
   /// type.
   /**
-   * @param content 如果传入的文档片段是当前节点类型的有效内容则返回true
-   * @returns 
+   * @param content 需要被添加作为当前节点内容的文档片段
+   * @returns 如果传入的文档片段是当前节点类型的有效内容则返回true
    */
   validContent(content: Fragment) {
     let result = this.contentMatch.matchFragment(content)
@@ -714,7 +725,7 @@ export interface NodeSpec {
   /// appropriate.
   /** schema中可以被设置成换行形式的单个内联节点。当块类型间转换时那些支持换行或不支持但`whitespace`
    * 设置为`"pre"`的节点和块类型会被`setBlockType`自动将断行节点中间的字符转换为新行
-   * (ai说是为了支持段内换行的场景) */
+   * (ai说是为了支持段内换行的场景，每个架构中只允许定义一个内联或叶子节点类型作为换行符) */
   linebreakReplacement?: boolean
 
   /// Node specs may include arbitrary properties that can be read by
@@ -878,9 +889,12 @@ export class Schema<Nodes extends string = any, Marks extends string = any> {
       if (prop in this.marks)
         throw new RangeError(prop + " can not be both a node and a mark")
       let type = this.nodes[prop], contentExpr = type.spec.content || "", markExpr = type.spec.marks
-      // 内容匹配
+      // 内容匹配 当前节点类型的内容匹配自动机
       type.contentMatch = contentExprCache[contentExpr] ||
-        (contentExprCache[contentExpr] = ContentMatch.parse(contentExpr, this.nodes))
+                          (contentExprCache[contentExpr] = ContentMatch.parse(contentExpr, this.nodes))
+      
+      // 当前节点类型是否是内联内容节点根据内容匹配自动机的下个匹配状态的节点类型是否是内联节点关联
+      // 即如果子节点类型是内联节点类型则当前节点类型则是内联内容类型
       ;(type as any).inlineContent = type.contentMatch.inlineContent
       // 处理架构中的换行节点问题
       if (type.spec.linebreakReplacement) {
@@ -889,9 +903,12 @@ export class Schema<Nodes extends string = any, Marks extends string = any> {
         this.linebreakReplacement = type
       }
       // 处理nodeType的mark问题
-      type.markSet = markExpr == "_" ? null :                 //显示定义允许所有markType
-        markExpr ? gatherMarks(this, markExpr.split(" ")) :   //如果有值，则获取当前架构的所有当前nodeType允许的markType（包含分组的问题，所以无法直接使用markType.name获取其markType）
-        markExpr == "" || !type.inlineContent ? [] : null     //当前节点mark属性为空(定义了该属性但其值为"")或者当前节点类型不是内联节点则当前节点不允许任何mark否则默认允许任何markType
+      // 显示定义允许所有markType
+      type.markSet = markExpr == "_" ? null :
+        // 如果有值，则获取当前架构的所有当前nodeType允许的markType（包含分组的问题，所以无法直接使用markType.name获取其markType）
+        markExpr ? gatherMarks(this, markExpr.split(" ")) :
+        // 当前节点mark属性为空(定义了该属性但其值为"")或者当前节点类型不是内联节点则当前节点不允许任何mark否则默认允许任何markType
+        markExpr == "" || !type.inlineContent ? [] : null
     }
     // 处理各个markType的包含关系
     for (let prop in this.marks) {

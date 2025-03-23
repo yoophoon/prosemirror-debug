@@ -439,7 +439,13 @@ export function replaceRangeWith(tr: Transform, from: number, to: number, node: 
   }
   tr.replaceRange(from, to, new Slice(Fragment.from(node), 0, 0))
 }
-
+/**
+ * 尝试找到一个能有效删除的位置并将其范围内的内容删除，会自动扩展以满足删除的要求
+ * @param tr 应用删除范围的事务
+ * @param from 文档删除的开始位置
+ * @param to 文档删除的结束位置
+ * @returns void
+ */
 export function deleteRange(tr: Transform, from: number, to: number) {
   let $from = tr.doc.resolve(from), $to = tr.doc.resolve(to)
   let covered = coveredDepths($from, $to)
@@ -460,6 +466,12 @@ export function deleteRange(tr: Transform, from: number, to: number) {
 
 // Returns an array of all depths for which $from - $to spans the
 // whole content of the nodes at that depth.
+/**
+ * 
+ * @param $from 起始位置的解析信息
+ * @param $to 结束位置的解析信息
+ * @returns 一个包含对应层级的所有$from - $to的节点信息数组
+ */
 function coveredDepths($from: ResolvedPos, $to: ResolvedPos) {
   let result: number[] = [], minDepth = Math.min($from.depth, $to.depth)
   for (let d = minDepth; d >= 0; d--) {

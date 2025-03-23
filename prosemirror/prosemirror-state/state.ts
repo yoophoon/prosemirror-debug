@@ -49,15 +49,11 @@ class FieldDesc<T> {
 
 /**
  * 4个基础字段用来初始化、应用tr，state.config.fields指向这4个基础字段
- * 后续的plugin也会生成一个FieldDesc实例并被push进state.config.fields
- * 
- * doc：文档内容
- * 
- * selection：选区内容
- * 
- * storedMarks：文档格式
- * 
- * scrollToSelection：文档变动
+ * 后续的plugin也会生成一个FieldDesc实例并被push进state.config.fields  
+ * doc：文档内容  
+ * selection：选区内容  
+ * storedMarks：文档格式  
+ * scrollToSelection：文档变动  
  */
 const baseFields = [
   new FieldDesc<Node>("doc", {
@@ -146,8 +142,7 @@ export interface EditorStateConfig {
 //MARK class EditorState
 /**
  * prosemirror编辑器的状态由这个类实例描述。
- * 状态是一个不会被更新但可以通过使用`apply`方法从前一个旧的state计算出新的状态值的持久数据结构
- * 
+ * 状态是一个不会被更新但可以通过使用`apply`方法从前一个旧的state计算出新的状态值的持久数据结构  
  * 状态保存着大量的内置字段并且插件也可以通过pluginSpec.state定义额外的字段
  * (只有插件定义了state属性才会被prosemirror内部认为是字段)
  */
@@ -221,6 +216,12 @@ export class EditorState {
   /// be influenced by the [transaction
   /// hooks](#state.PluginSpec.filterTransaction) of
   /// plugins) along with the new state.
+  /**
+   * `editorState.apply`的实现方法。返回被应用于新状态的精确的tr
+   * (不只1个，插件也能添加事务，这些tr可能是被插件的钩子(pluginSpec.filterTransaction)影响所产生的)
+   * @param rootTr 触发此次更新的transaction期间可能会因为其他插件的作用产生新的tr
+   * @returns 应用指定transaction的state以及期间产生的所有transaction
+   */
   applyTransaction(rootTr: Transaction): {state: EditorState, transactions: readonly Transaction[]} {
     //有插件阻止了这次事务
     if (!this.filterTransaction(rootTr)) return {state: this, transactions: []}
@@ -356,7 +357,8 @@ export class EditorState {
   /// to deserialize the state of plugins, by associating plugin
   /// instances with the property names they use in the JSON object.
   /**
-   * 
+   * 反序列化state的JSON对象。`config`应该至少有`schema`和用于初始化插件状态的`plugins`字段，
+   * `pluginFields`通过用于JSON对象的属性名关联的插件实例来反序列化插件的状态
    * @param config 用于生成State的配置
    * @param json 反序列化的JSON对象
    * @param pluginFields 插件字段

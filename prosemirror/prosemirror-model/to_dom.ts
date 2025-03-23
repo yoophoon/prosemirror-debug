@@ -329,6 +329,7 @@ function renderSpec(doc: Document, structure: DOMOutputSpec, xmlNS: string | nul
     start = 2
     // 遍历属性对象并将其值赋给DOM
     for (let name in attrs) if (attrs[name] != null) {
+      // prosemirror对于元素属性采用命名空间是用`namespace name:attribute`的形式
       let space = name.indexOf(" ")
       if (space > 0) dom.setAttributeNS(name.slice(0, space), name.slice(space + 1), attrs[name])
       else dom.setAttribute(name, attrs[name])

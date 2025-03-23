@@ -128,8 +128,14 @@ export class RemoveMarkStep extends Step {
 Step.jsonID("removeMark", RemoveMarkStep)
 
 /// Add a mark to a specific node.
+/** 为指定节点添加一个mark */
 export class AddNodeMarkStep extends Step {
   /// Create a node mark step.
+  /**
+   * 构造一个addNodeMarkStep实例
+   * @param pos 指定位置 该位置用于查找要应用mark的节点
+   * @param mark 指定mark 该mark将会被应用于指定位置的节点
+   */
   constructor(
     /// The position of the target node.
     readonly pos: number,
@@ -147,9 +153,12 @@ export class AddNodeMarkStep extends Step {
   }
 
   invert(doc: Node): Step {
+    // 反转当前节点添加mark操作 
     let node = doc.nodeAt(this.pos)
     if (node) {
       let newSet = this.mark.addToSet(node.marks)
+      // 如果节点应用的marks已经包含this.mark了，这里好像是验证协同文档
+      // https://github.com/ProseMirror/prosemirror-transform/pull/22
       if (newSet.length == node.marks.length) {
         for (let i = 0; i < node.marks.length; i++)
           if (!node.marks[i].isInSet(newSet))
