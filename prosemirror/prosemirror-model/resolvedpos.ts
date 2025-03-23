@@ -72,7 +72,7 @@ export class ResolvedPos {
   /// same as `p.parent`.
   /**
    * 传入的层级的祖先节点。`p.node(p.depth)`和`p.parent`一样
-   * @param depth 层级
+   * @param depth 层级，如果未指定则采用this.depth
    * @returns 返回指定层级的父节点
    */
   node(depth?: number | null): Node { return this.path[this.resolveDepth(depth) * 3] }
@@ -81,8 +81,8 @@ export class ResolvedPos {
   /// at the 3rd node in the 2nd paragraph on the top level, for
   /// example, `p.index(0)` is 1 and `p.index(1)` is 2.
   /**
-   * 传入的层级的父元素的索引（类似父元素的nthChild）。
-   * 比如resolvedPos指向顶层节点的第二个段落的第三个节点则`p.index(0)`是1而`p.index(1)`是2
+   * 被解析的位置在传入的层级的父元素的子元素的索引（类似父元素的nthChild）。  
+   * 比如resolvedPos指向顶层节点的第二个段落的第三个节点则`p.index(0)`是1(即第二个子元素)而`p.index(1)`是2(即第三个子元素)
    * @param depth 层级
    * @returns 返回位置在指定层级的元素在其父元素的索引
    */
