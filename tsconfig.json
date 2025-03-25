@@ -13,7 +13,16 @@
       "prosemirror-transform":["./prosemirror/prosemirror-transform/index"],
       "prosemirror-state":["./prosemirror/prosemirror-state/index"],
       "prosemirror-schema-basic":["./prosemirror/prosemirror-schema-basic/schema-basic"],
-      "prosemirror-keymap":["./prosemirror/prosemirror-keymap/keymap"]
+      "prosemirror-keymap":["./prosemirror/prosemirror-keymap/keymap"],
+      "prosemirror-inputrules":["./prosemirror/prosemirror-inputrules/index"],
+      "prosemirror-commands":["./prosemirror/prosemirror-commands/commands"],
+      "prosemirror-history":["./prosemirror/prosemirror-history/history"],
+      "prosemirror-dropcursor":["./prosemirror/prosemirror-dropcursor/dropcursor"],
+      "prosemirror-gapcursor":["./prosemirror/prosemirror-gapcursor/index"],
+      "prosemirror-menu":["./prosemirror/prosemirror-menu/index"],
+      "prosemirror-schema-list":["./prosemirror/prosemirror-schema-list/schema-list"],
+
+      "prosemirror-mermaid":["./plugins/prosemirror-mermaid/index"],
     },
 
     /* Bundler mode */
@@ -30,5 +39,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "prosemirror"]
+  "include": ["src", "prosemirror", "plugins"]
 }

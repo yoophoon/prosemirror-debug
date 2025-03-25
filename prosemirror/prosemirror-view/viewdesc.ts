@@ -684,6 +684,17 @@ export class NodeViewDesc extends ViewDesc {
   // since it'd require exposing a whole slew of finicky
   // implementation details to the user code that they probably will
   // never need.)
+  //MARK NodeViewDesc.create
+  /**
+   * 
+   * @param parent 
+   * @param node 
+   * @param outerDeco 
+   * @param innerDeco 
+   * @param view 
+   * @param pos 
+   * @returns 
+   */
   static create(parent: ViewDesc | undefined, node: Node, outerDeco: readonly Decoration[],
                 innerDeco: DecorationSource, view: EditorView, pos: number) {
     let custom = view.nodeViews[node.type.name], descObj: ViewDesc
