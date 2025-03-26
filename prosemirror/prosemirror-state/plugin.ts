@@ -33,7 +33,8 @@ export interface PluginSpec<PluginState> {
   /// will be called when the plugin's state is associated with an
   /// editor view.
   /** 当插件需要与编辑器视图交互或在DOM上设置一些属性时使用这个字段。
-   * 函数会在插件的状态被关联到一个编辑器视图的时候调用。（设置一些dom与用户交互）
+   * 函数会在插件的状态被关联到一个编辑器视图的时候调用。（设置一些dom与用户交互）  
+   * @demo see [tooltip](https://prosemirror.xheldon.com/examples/tooltip/)
    * @param view 编辑器视图
    * @returns 一个pluginView对象
    */

@@ -7,6 +7,7 @@
     "skipLibCheck": true,
 
     "baseUrl": "./",
+    "typeRoots": ["./utils/rope-sequence"],
     "paths":{
       "prosemirror-view":["./prosemirror/prosemirror-view/index"],
       "prosemirror-model":["./prosemirror/prosemirror-model/index"],
@@ -21,11 +22,19 @@
       "prosemirror-gapcursor":["./prosemirror/prosemirror-gapcursor/index"],
       "prosemirror-menu":["./prosemirror/prosemirror-menu/index"],
       "prosemirror-schema-list":["./prosemirror/prosemirror-schema-list/schema-list"],
+      "prosemirror-tables":["./prosemirror/prosemirror-tables/index"],
+      "prosemirror-example-setup":["./prosemirror/prosemirror-example-setup/index"],
 
       "prosemirror-mermaid":["./plugins/prosemirror-mermaid/index"],
+
+      "crelt":["./utils/crelt/"],
+      "rope-sequence":["./utils/rope-sequence"],
+
+      "styles":["./styles"]
     },
 
     /* Bundler mode */
+    "allowJs":true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
@@ -34,10 +43,10 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "prosemirror", "plugins"]
+  "include": ["src", "prosemirror", "plugins", "utils","style", "mainHistory"]
 }
